@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 // https://api.cognitive.microsofttranslator.com/languages?api-version=3.0
 
-export const remoteTranslate = (data, to) => {
+export const remoteTranslate = (data, to, from = 'zh-Hans') => {
   const key = ""; // 填入azure 服务的密钥
   const endpoint = "https://api.cognitive.microsofttranslator.com";
   const location = "eastasia"; // azure服务的位置区域
@@ -20,8 +20,8 @@ export const remoteTranslate = (data, to) => {
     },
     params: {
       'api-version': '3.0',
-      'from': 'zh-Hans',
-      'to': to,
+      from,
+      to,
     },
     responseType: 'json',
     data,
