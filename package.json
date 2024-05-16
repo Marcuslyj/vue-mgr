@@ -1,0 +1,50 @@
+{
+  "name": "vue-mgr",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write src/",
+    "lang:trans": "node src/common/lang/scripts/translate.js",
+    "lang:output": "node src/common/lang/scripts/output.js",
+    "lang:trans:output": "npm run lang:trans && npm run lang:output"
+  },
+  "dependencies": {
+    "@vueuse/core": "^10.9.0",
+    "alova": "^2.20.4",
+    "axios": "^1.6.8",
+    "bing-translate-api": "^4.0.1",
+    "element-plus": "^2.7.3",
+    "fast-glob": "^3.3.2",
+    "lodash": "^4.17.21",
+    "pinia": "^2.1.7",
+    "uuid": "^9.0.1",
+    "vue": "^3.4.21",
+    "vue-i18n": "9",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.8.0",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.23.0",
+    "glob": "^10.3.15",
+    "minimist": "^1.2.8",
+    "postcss": "^8.4.38",
+    "prettier": "^3.2.5",
+    "sass": "^1.77.1",
+    "tailwindcss": "^3.4.3",
+    "unplugin-auto-import": "^0.17.6",
+    "unplugin-element-plus": "^0.8.0",
+    "unplugin-vue-components": "^0.27.0",
+    "unplugin-vue-router": "^0.8.6",
+    "vite": "^5.2.8"
+  }
+}
