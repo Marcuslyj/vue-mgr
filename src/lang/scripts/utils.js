@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 // https://api.cognitive.microsofttranslator.com/languages?api-version=3.0
 
 export const remoteTranslate = (data, to) => {
-  const key = ""; // 填入azure 服务的密钥
+  const key = "7c463331a44543ee8ca9942ae13a05cc"; // 填入azure 服务的密钥
   const endpoint = "https://api.cognitive.microsofttranslator.com";
   const location = "eastasia"; // azure服务的位置区域
 
@@ -30,7 +30,7 @@ export const remoteTranslate = (data, to) => {
 
 export const combineLang = (lang) => {
   if (!lang) return
-  const langFiles = import.meta.glob('@/common/lang/modules/**/*.js', { eager: false })
+  const langFiles = import.meta.glob('@/lang/modules/**/*.js', { eager: false })
 
   const filterPaths = Object.keys(langFiles).filter(key => key.includes(`/${lang}.js`))
 

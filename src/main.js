@@ -6,7 +6,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
-import { setupI18n } from '@/common/lang/scripts/i18n'
+import { setupI18n } from '@/lang/scripts/i18n'
 
 
 const app = createApp(App)

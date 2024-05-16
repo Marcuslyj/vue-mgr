@@ -23,7 +23,7 @@ const argv = minimist(process.argv.slice(2));
 const [targetFolder] = argv._;
 
 const root = process.cwd()
-const moduleRoot = 'src/common/lang/modules'
+const moduleRoot = 'src/lang/modules'
 const moduleRootPath = path.join(root, moduleRoot)
 
 

@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
-    "lang:trans": "node src/common/lang/scripts/translate.js",
-    "lang:output": "node src/common/lang/scripts/output.js",
+    "lang:trans": "node src/lang/scripts/translate.js",
+    "lang:output": "node src/lang/scripts/output.js",
     "lang:trans:output": "npm run lang:trans && npm run lang:output"
   },
   "dependencies": {

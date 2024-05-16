@@ -9,7 +9,7 @@ import path from 'path'
 import fs from 'fs'
 
 const root = process.cwd()
-const outputRoot = 'src/common/lang'
+const outputRoot = 'src/lang'
 const outputRootPath = path.join(root, outputRoot)
 
 const output = async (lang, files = []) => {
@@ -41,7 +41,7 @@ const onfillFinish = (result, lang) => {
 }
 
 const excutor = async () => {
-  const moduleRoot = 'src/common/lang/modules'
+  const moduleRoot = 'src/lang/modules'
   const files = fg.sync([`${moduleRoot}/**/*.js`], { ignore: ['*.js'] })
   const langs = ['zh', 'en', 'fr']
   langs.forEach(lang => output(lang, files))

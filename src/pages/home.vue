@@ -2,7 +2,7 @@
 import { getCurrentInstance } from 'vue'
 import { ElButton } from 'element-plus'
 // import TheWelcome from '../components/TheWelcome.vue'
-import { setI18nLanguage } from '@/common/lang/scripts/i18n'
+import { setI18nLanguage } from '@/lang/scripts/i18n'
 import { useGlobalStore } from '@/stores/global'
 
 const globalStore = useGlobalStore()
