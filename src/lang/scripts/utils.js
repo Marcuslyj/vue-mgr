@@ -27,14 +27,3 @@ export const remoteTranslate = (data, to, from = 'zh-Hans') => {
     data,
   })
 }
-
-export const combineLang = (lang) => {
-  if (!lang) return
-  const langFiles = import.meta.glob('@/lang/modules/**/*.js', { eager: false })
-
-  const filterPaths = Object.keys(langFiles).filter(key => key.includes(`/${lang}.js`))
-
-  // const out 
-
-  console.log(filterPaths)
-}

@@ -15,77 +15,74 @@ import { remoteTranslate } from './utils.js'
 
 const { get } = lodash
 
-const langs = {
-  "zh": "zh", "en": "en", "fr": "fr"
-}
-
+const langs = { "zh": "zh", "en": "en", "fr": "fr" }
 const argv = minimist(process.argv.slice(2));
-const [targetFolder] = argv._;
-
+const [targetFolder] = argv._; // 指定需要翻译的子模块
 const root = process.cwd()
 const moduleRoot = 'src/lang/modules'
 const moduleRootPath = path.join(root, moduleRoot)
 
-
 const hasLangJs = (lang, files) => files.includes(`${lang}.js`)
 
-
+/**
+ * 子模块根据中文翻译成目标语言
+ * @param {*} lang 翻译的目标语言
+ * @param {*} folderPath 模块路径
+ */
 const transLang = async (lang, folderPath) => {
   const files = fg.sync([`${folderPath}/*.js`]).map(path => path.split('/').pop())
   if (!hasLangJs(langs.zh, files)) return
 
-  const filePath = folderPath.replace(moduleRoot + '/', '')
-  const [folder] = filePath.split('/')
-  const zh = (await import('../modules/' + folder + '/zh.js')).default
+  const moduleName = folderPath.split('/').pop()
+  const zh = (await import(`../modules/${moduleName}/zh.js`)).default // 读取中文翻译
 
-  let target = {}
+  let result = {} // 结果对象
   const hasTargetLangFile = hasLangJs(lang, files)
-  if (hasTargetLangFile)
-    target = (await import(`../modules/${folder}/${lang}.js`)).default
-
-  const fieldsToTrans = []
-  for (const [k, txt] of Object.entries(zh)) {
-    if ((!get(target, k, '').trim()) && txt.trim()) {
-      fieldsToTrans.push(k)
-    }
+  let existTargetLang = {}
+  if (hasTargetLangFile) {
+    existTargetLang = (await import(`../modules/${moduleName}/${lang}.js`)).default || {} // 读取目标语言翻译
   }
 
+  const fieldsToTrans = []
+  const allFields = []
+  for (const [k, txt = ''] of Object.entries(zh)) {
+    result[k] = Reflect.has(existTargetLang, k) ? existTargetLang[k] : ''
+    // 空值才需要翻译，否则沿用
+    if ((!get(result, k, '').trim()) && txt.trim()) fieldsToTrans.push(k)
+    allFields.push(k)
+  }
+  // 创建翻译请求参数
   const reqData = fieldsToTrans.map(field => ({ text: zh[field] }))
 
   if (reqData.length) {
-    const res = await remoteTranslate(reqData, lang)
-    const translations = res.data;
+    const translations = (await remoteTranslate(reqData, lang)).data || []
     translations.forEach((t, i) => {
-      target[fieldsToTrans[i]] = get(t, "translations[0].text", '')
+      result[fieldsToTrans[i]] = get(t, "translations[0].text", '')
     })
 
-    const objString = `export default ${JSON.stringify(target, null, 2)};\n`;
-    fs.writeFile(path.join(moduleRootPath, `/${folder}/${lang}.js`), objString,
-      (err) => {
-        if (err) {
-          // console.error('Error:', err);
-        } else {
-          // console.log('Object has been written to output.js');
-        }
-      });
+    // 重新设置一遍，保证字段顺序一致，否则新设置的翻译的字段会追加在最后
+    allFields.forEach(field => {
+      // eslint-disable-next-line
+      result[field] = result[field]
+    })
+
+    const objString = `export default ${JSON.stringify(result, null, 2)};\n`;
+    fs.writeFile(path.join(moduleRootPath, `/${moduleName}/${lang}.js`), objString, () => { });
   }
 }
 
+/**
+ * 执行翻译子模块
+ */
 const excutor = () => {
-  let files
-  if (targetFolder) {
-    files = [`${moduleRoot}/${targetFolder}`]
-  } else {
-    files = fg.sync([`${moduleRoot}/*`], { onlyDirectories: true, ignore: `${moduleRoot}/.*` })
-  }
+  const folderPaths = targetFolder
+    ? [`${moduleRoot}/${targetFolder}`] // 有指定目标模块
+    : fg.sync([`${moduleRoot}/*`], { onlyDirectories: true, ignore: `${moduleRoot}/.*` }) // 所有模块
 
-
-  files.forEach(async folderPath => {
+  folderPaths.forEach(async folderPath => {
     transLang('en', folderPath)
     transLang('fr', folderPath)
   })
 }
 
-
 excutor()
-

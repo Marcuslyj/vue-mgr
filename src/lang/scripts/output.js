@@ -12,15 +12,20 @@ const root = process.cwd()
 const outputRoot = 'src/lang'
 const outputRootPath = path.join(root, outputRoot)
 
+/**
+ * 组合特定语言的所有模块，输出
+ * @param {*} lang 
+ * @param {*} files 
+ */
 const output = async (lang, files = []) => {
-  const targets = files.filter(file => file.includes(`${lang}.js`))
-  if (!targets.length) return
+  const filePaths = files.filter(file => file.includes(`${lang}.js`))
+  if (!filePaths.length) return
 
   const result = {}
 
-  for (let i = 0; i < targets.length; i++) {
-    const target = targets[i]
-    const [moduleName] = target.split('/').slice(-2)
+  for (let i = 0; i < filePaths.length; i++) {
+    const filePath = filePaths[i]
+    const [moduleName] = filePath.split('/').slice(-2)
     const content = (await import(`../modules/${moduleName}/${lang}.js`)).default
     result[moduleName] = content
   }
@@ -28,6 +33,11 @@ const output = async (lang, files = []) => {
   onfillFinish(result, lang)
 }
 
+/**
+ * 填充完成，生成lang/{zh|en|fr}.js
+ * @param {*} result 
+ * @param {*} lang 
+ */
 const onfillFinish = (result, lang) => {
   const objString = `export default ${JSON.stringify(result, null, 2)};\n`;
   fs.writeFile(path.join(outputRootPath, `/${lang}.js`), objString,
@@ -40,6 +50,9 @@ const onfillFinish = (result, lang) => {
     });
 }
 
+/**
+ * 执行
+ */
 const excutor = async () => {
   const moduleRoot = 'src/lang/modules'
   const files = fg.sync([`${moduleRoot}/**/*.js`], { ignore: ['*.js'] })
