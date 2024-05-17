@@ -79,10 +79,9 @@ const excutor = () => {
     ? [`${moduleRoot}/${targetFolder}`] // 有指定目标模块
     : fg.sync([`${moduleRoot}/*`], { onlyDirectories: true, ignore: `${moduleRoot}/.*` }) // 所有模块
 
-  folderPaths.forEach(async folderPath => {
-    transLang('en', folderPath)
-    transLang('fr', folderPath)
-  })
+  folderPaths.forEach(folderPath =>
+    ['en', 'fr'].forEach(lang => transLang(lang, folderPath))
+  )
 }
 
 excutor()
