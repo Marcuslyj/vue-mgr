@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router/auto'
+
 import cusRoutes from './routes'
 
 const router = createRouter({

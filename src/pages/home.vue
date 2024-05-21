@@ -1,6 +1,7 @@
 <script setup>
-import { getCurrentInstance } from 'vue'
 import { ElButton } from 'element-plus'
+import { getCurrentInstance } from 'vue'
+
 // import TheWelcome from '../components/TheWelcome.vue'
 import { setI18nLanguage } from '@/lang/scripts/i18n'
 import { useGlobalStore } from '@/stores/global'

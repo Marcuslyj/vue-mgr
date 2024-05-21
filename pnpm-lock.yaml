@@ -61,6 +61,9 @@ devDependencies:
   eslint:
     specifier: ^8.57.0
     version: 8.57.0
+  eslint-plugin-simple-import-sort:
+    specifier: ^12.1.0
+    version: 12.1.0(eslint@8.57.0)
   eslint-plugin-vue:
     specifier: ^9.23.0
     version: 9.26.0(eslint@8.57.0)
@@ -1741,6 +1744,14 @@ packages:
       prettier: 3.2.5
       prettier-linter-helpers: 1.0.0
       synckit: 0.8.8
+    dev: true
+
+  /eslint-plugin-simple-import-sort@12.1.0(eslint@8.57.0):
+    resolution: {integrity: sha512-Y2fqAfC11TcG/WP3TrI1Gi3p3nc8XJyEOJYHyEPEGI/UAgNx6akxxlX74p7SbAQdLcgASKhj8M0GKvH3vq/+ig==}
+    peerDependencies:
+      eslint: '>=5.0.0'
+    dependencies:
+      eslint: 8.57.0
     dev: true
 
   /eslint-plugin-vue@9.26.0(eslint@8.57.0):

@@ -1,4 +1,5 @@
 import { createI18n } from 'vue-i18n'
+
 import { useGlobalStore } from '@/stores/global'
 
 export const SUPPORT_LOCALES = ['zh', 'en', 'fr']

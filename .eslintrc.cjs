@@ -11,7 +11,12 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest'
   },
+  plugins: [
+    'simple-import-sort',
+  ],
   rules: {
     "vue/multi-word-component-names": "off",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
   }
 }

@@ -6,11 +6,12 @@
  * otherwise read the file and translate the vacancies
  */
 
-import minimist from 'minimist'
 import fg from 'fast-glob'
-import path from 'path'
 import fs from 'fs'
 import lodash from 'lodash'
+import minimist from 'minimist'
+import path from 'path'
+
 import { remoteTranslate } from './utils.js'
 
 const { get } = lodash

@@ -5,8 +5,8 @@
 /* global process */
 
 import fg from 'fast-glob'
-import path from 'path'
 import fs from 'fs'
+import path from 'path'
 
 const root = process.cwd()
 const outputRoot = 'src/lang'
