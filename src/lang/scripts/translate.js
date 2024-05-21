@@ -66,13 +66,13 @@ const transLang = async (lang, folderPath) => {
       result[fieldsToTrans[i]] = get(t, "translations[0].text", '')
     })
 
-    // 重新设置一遍，保证字段顺序一致，否则新设置的翻译的字段会追加在最后
-    allFields.forEach(field => {
-      // eslint-disable-next-line
-      result[field] = result[field]
-    })
+    // // 重新设置一遍，保证字段顺序一致，否则新设置的翻译的字段会追加在最后
+    // allFields.forEach(field => {
+    //   // eslint-disable-next-line
+    //   result[field] = result[field]
+    // })
 
-    const objString = `export default ${JSON.stringify(result, null, 2)};\n`;
+    const objString = `export default ${JSON.stringify(result, fieldsToTrans, 2)};\n`; // 指定字段输出顺序
     fs.writeFile(path.join(moduleRootPath, `/${moduleName}/${lang}.js`), objString, () => { });
   }
 }
