@@ -1,0 +1,6 @@
+{
+  "globals": {
+    "getCurrentInstance": true,
+    "ref": true
+  }
+}

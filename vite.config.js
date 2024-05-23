@@ -19,6 +19,10 @@ export default defineConfig({
     vueJsx(),
     AutoImport({
       resolvers: [ElementPlusResolver()],
+      imports: [{ vue: ['ref', 'getCurrentInstance'] }],
+      eslintrc: {
+        enabled: true, // <-- this
+      },
     }),
     Components({
       resolvers: [ElementPlusResolver()],

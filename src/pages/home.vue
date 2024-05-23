@@ -1,11 +1,8 @@
 <script setup>
-import { ElButton } from 'element-plus'
-import { getCurrentInstance } from 'vue'
-
-// import TheWelcome from '../components/TheWelcome.vue'
 import { setI18nLanguage } from '@/lang/scripts/i18n'
 import { useGlobalStore } from '@/stores/global'
 
+const count = ref(0)
 const globalStore = useGlobalStore()
 
 const instance = getCurrentInstance()
@@ -18,7 +15,6 @@ const btnActive = (lang) => (globalStore.lang === lang ? 'primary' : 'default')
 
 <template>
   <main>
-    <!-- <TheWelcome /> -->
     <!-- <h1 class="title tw-comp">home<span class="underline">kk</span></h1> -->
     <ElButton :type="btnActive('zh')" @click="setLang('zh')">中文</ElButton>
     <ElButton :type="btnActive('en')" @click="setLang('en')">English</ElButton>
@@ -27,6 +23,8 @@ const btnActive = (lang) => (globalStore.lang === lang ? 'primary' : 'default')
     <h1>{{ $t('setting.close') }}</h1>
     <h1>{{ $t('setting.open') }}</h1>
     <h1>{{ $t('setting.home') }}</h1>
+    count: {{ count }}
+    <ElButton @click="count++">count it</ElButton>
   </main>
 </template>
 
