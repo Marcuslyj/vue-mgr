@@ -2,29 +2,28 @@
 import { setI18nLanguage } from '@/lang/scripts/i18n'
 import { useGlobalStore } from '@/stores/global'
 
-const count = ref(0)
 const globalStore = useGlobalStore()
 
+const lang = ref(globalStore.lang)
 const instance = getCurrentInstance()
 const setLang = (lang) => {
   const app = instance.appContext.app
   setI18nLanguage(app.__VUE_I18N__, lang)
 }
-const btnActive = (lang) => (globalStore.lang === lang ? 'primary' : 'default')
 </script>
 
 <template>
   <main>
     <!-- <h1 class="title tw-comp">home<span class="underline">kk</span></h1> -->
-    <ElButton :type="btnActive('zh')" @click="setLang('zh')">中文</ElButton>
-    <ElButton :type="btnActive('en')" @click="setLang('en')">English</ElButton>
-    <ElButton :type="btnActive('fr')" @click="setLang('fr')">Français</ElButton>
+    <el-select class="!w-[245px]" v-model="lang" @change="setLang">
+      <el-option label="中文" value="zh"></el-option>
+      <el-option label="English" value="en"></el-option>
+      <el-option label="Français" value="fr"></el-option>
+    </el-select>
 
     <h1>{{ $t('setting.close') }}</h1>
     <h1>{{ $t('setting.open') }}</h1>
     <h1>{{ $t('setting.home') }}</h1>
-    count: {{ count }}
-    <ElButton @click="count++">count it</ElButton>
   </main>
 </template>
 
