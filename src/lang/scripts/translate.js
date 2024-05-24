@@ -73,7 +73,8 @@ const transLang = async (lang, folderPath) => {
     //   result[field] = result[field]
     // })
 
-    const objString = `export default ${JSON.stringify(result, fieldsToTrans, 2)};\n`; // 指定字段输出顺序
+
+    const objString = `export default ${JSON.stringify(result, allFields, 2)};\n`; // 指定字段输出顺序
     fs.writeFile(path.join(moduleRootPath, `/${moduleName}/${lang}.js`), objString, () => { });
   }
 }

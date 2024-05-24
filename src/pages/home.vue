@@ -15,7 +15,7 @@ const setLang = (lang) => {
 <template>
   <main>
     <!-- <h1 class="title tw-comp">home<span class="underline">kk</span></h1> -->
-    <el-select class="!w-[245px]" v-model="lang" @change="setLang">
+    <el-select class="!w-[100px]" v-model="lang" @change="setLang">
       <el-option label="中文" value="zh"></el-option>
       <el-option label="English" value="en"></el-option>
       <el-option label="Français" value="fr"></el-option>
