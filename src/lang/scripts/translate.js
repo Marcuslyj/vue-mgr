@@ -14,7 +14,7 @@ import path from 'path'
 
 import { remoteTranslate } from './utils.js'
 
-const { get } = lodash
+const { get, set } = lodash
 
 const langs = { "zh": "zh", "en": "en", "fr": "fr" }
 const remoteLangDict = {
@@ -51,32 +51,68 @@ const transLang = async (lang, folderPath) => {
   }
 
   const fieldsToTrans = []
-  const allFields = []
-  for (const [k, txt = ''] of Object.entries(fromData)) {
-    result[k] = Reflect.has(existTargetLang, k) ? existTargetLang[k] : ''
-    // 空值才需要翻译，否则沿用
-    if ((!get(result, k, '').trim()) && txt.trim()) fieldsToTrans.push(k)
-    allFields.push(k)
+  const formatChainKey = (key, prekey) => prekey ? `${prekey}.${key}` : key
+  /**
+   * @param {逐层遍历的当前遍历对象} curFrom 
+   * @param {完整的toData} toData 
+   * @param {keychain} preKey 
+   */
+  const loopAndGetNeedTrans = (curFrom = {}, toData = {}, existData = {}, preKey = '') => {
+    for (const [curkey, value] of Object.entries(curFrom)) {
+      const chainKey = formatChainKey(curkey, preKey)
+      if (!value) {
+        set(toData, chainKey, value)
+        continue
+      }
+      if (typeof value === 'string') {
+        const existVal = get(existData, chainKey, '')
+        if (typeof get(existData, chainKey) !== 'string') set(toData, chainKey, '')
+        // 空值才需要翻译，否则沿用
+        if (!value.trim()) {
+          set(toData, chainKey, '')
+        } else if (existVal.trim()) {
+          set(toData, chainKey, existVal) // 复用
+        } else {
+          fieldsToTrans.push(chainKey)
+        }
+        continue
+      }
+      if (typeof value === 'object') {
+        set(toData, chainKey, get(toData, chainKey, {}))
+        loopAndGetNeedTrans(value, toData, existData, chainKey)
+      }
+    }
   }
+
+  // 获取需要翻译的字段
+  loopAndGetNeedTrans(fromData, result, existTargetLang)
+
   // 创建翻译请求参数
-  const reqData = fieldsToTrans.map(field => ({ text: fromData[field] }))
+  const reqData = fieldsToTrans.map(field => ({ text: get(fromData, field) }))
 
   if (reqData.length) {
     const translations = (await remoteTranslate(reqData, lang, remoteLangDict[from])).data || []
     translations.forEach((t, i) => {
-      result[fieldsToTrans[i]] = get(t, "translations[0].text", '')
+      set(result, fieldsToTrans[i], get(t, "translations[0].text", ''))
     })
-
-    // // 重新设置一遍，保证字段顺序一致，否则新设置的翻译的字段会追加在最后
-    // allFields.forEach(field => {
-    //   // eslint-disable-next-line
-    //   result[field] = result[field]
-    // })
-
-
-    const objString = `export default ${JSON.stringify(result, allFields, 2)};\n`; // 指定字段输出顺序
-    fs.writeFile(path.join(moduleRootPath, `/${moduleName}/${lang}.js`), objString, () => { });
   }
+
+
+  // 遍历重设一遍，保证字段顺序一致
+  const loopAndSet = (curFrom, toData, preKey) => {
+    for (const [curkey, value] of Object.entries(curFrom)) {
+      const chainKey = formatChainKey(curkey, preKey)
+      set(toData, chainKey, get(toData, chainKey))
+      if (typeof value === 'object') {
+        loopAndSet(value, toData, chainKey)
+      }
+    }
+  }
+  // 不翻译也重新生成，保证字段同步一致。
+  loopAndSet(fromData, result)
+
+  const objString = `export default ${JSON.stringify(result, null, 2)};\n`; // 指定字段输出顺序
+  fs.writeFile(path.join(moduleRootPath, `/${moduleName}/${lang}.js`), objString, () => { })
 }
 
 /**

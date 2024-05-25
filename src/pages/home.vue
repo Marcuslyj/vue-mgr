@@ -24,6 +24,7 @@ const setLang = (lang) => {
     <h1>{{ $t('setting.close') }}</h1>
     <h1>{{ $t('setting.open') }}</h1>
     <h1>{{ $t('setting.home') }}</h1>
+    <h1>{{ $t('customer.column.gender.male') }}</h1>
   </main>
 </template>
 
