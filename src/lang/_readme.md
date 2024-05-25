@@ -13,4 +13,4 @@ lang:trans -- from zh
 
 ## others
 
-子模块中，数据对象保持单层级
+子模块中，数据对象~~保持单层级~~，已支持nested data
