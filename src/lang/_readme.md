@@ -13,4 +13,5 @@ lang:trans -- from zh
 
 ## others
 
-子模块中，数据对象~~保持单层级~~，已支持nested data
+- 子模块中，数据对象~~保持单层级~~，已支持nested data
+- 约定lang/{zh|en|fr}.js使用命令lang:output汇总生成，不直接修改！
