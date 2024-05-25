@@ -9,7 +9,7 @@ lang:trans -- from zh
 
 ## lang:output
 
-将modules里边的内容，组合生成labg/{zh|en|fr}.js
+将modules里边的内容，组合生成lang/{zh|en|fr}.js
 
 ## others
 
