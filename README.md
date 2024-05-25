@@ -34,10 +34,12 @@ npm run build
 npm run lint
 ```
 
-unplugin-vue-router
-tailwindcss
-sass
-element-plus
-vueuse
-alova
-vue-i18n
+- unplugin-vue-router
+- tailwindcss
+- sass
+- element-plus
+- vueuse
+- alova
+- vue-i18n
+- unplugin-auto-import
+- auto translate
