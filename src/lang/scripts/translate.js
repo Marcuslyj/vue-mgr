@@ -30,6 +30,57 @@ const moduleRoot = 'src/lang/modules'
 const moduleRootPath = path.join(root, moduleRoot)
 
 const hasLangJs = (lang, files) => files.includes(`${lang}.js`)
+const formatChainKey = (key, prekey) => prekey ? `${prekey}.${key}` : key
+
+/**
+ * 获取需要翻译字段 & 复用已翻译（且翻译from文件存在）字段
+ * @param {逐层遍历的当前遍历对象} curFrom 
+ * @param {完整的toData} toData 
+ * @param {keychain} preKey 
+ * @returns {需要翻译字段数组} fieldsToTrans
+ */
+const loopAndGetNeedTrans = (curFrom = {}, toData = {}, existData = {}, fieldsToTrans = [], preKey = '') => {
+  for (const [curkey, value] of Object.entries(curFrom)) {
+    const chainKey = formatChainKey(curkey, preKey)
+    if (!value) {
+      set(toData, chainKey, value)
+      continue
+    }
+    if (typeof value === 'string') {
+      const existVal = get(existData, chainKey, '')
+      if (typeof get(existData, chainKey) !== 'string') set(toData, chainKey, '')
+      // 空值才需要翻译，否则沿用
+      if (!value.trim()) {
+        set(toData, chainKey, '')
+      } else if (existVal.trim()) {
+        set(toData, chainKey, existVal) // 复用
+      } else {
+        fieldsToTrans.push(chainKey)
+      }
+      continue
+    }
+    if (typeof value === 'object') {
+      set(toData, chainKey, get(toData, chainKey, {}))
+      loopAndGetNeedTrans(value, toData, existData, fieldsToTrans, chainKey)
+    }
+  }
+  return fieldsToTrans
+}
+
+/**
+ * 遍历重设一遍，保证字段顺序一致
+ * @param {fromData逐层遍历对象} curFrom 
+ * @param {完整的result对象} toData 
+ * @param {chainKey} preKey 
+ */
+const loopAndSet = (curFrom, toData, preKey) => {
+  for (const [curkey, value] of Object.entries(curFrom)) {
+    const chainKey = formatChainKey(curkey, preKey)
+    set(toData, chainKey, get(toData, chainKey, ''))
+    if (typeof value === 'object')
+      loopAndSet(value, toData, chainKey)
+  }
+}
 
 /**
  * 子模块根据中文翻译成目标语言
@@ -38,77 +89,28 @@ const hasLangJs = (lang, files) => files.includes(`${lang}.js`)
  */
 const transLang = async (lang, folderPath) => {
   const files = fg.sync([`${folderPath}/*.js`]).map(path => path.split('/').pop())
-  if (!hasLangJs(langs[from], files)) return
+  if (!hasLangJs(langs[from], files)) return // 翻译from文件不存在，停止执行
 
   const moduleName = folderPath.split('/').pop()
-  const fromData = (await import(`../modules/${moduleName}/${from}.js`)).default // 读取中文翻译
+  const fromData = (await import(`../modules/${moduleName}/${from}.js`)).default // 读取翻译from文件
 
-  let result = {} // 结果对象
+  const result = {} // 结果对象
   const hasTargetLangFile = hasLangJs(lang, files)
-  let existTargetLang = {}
-  if (hasTargetLangFile) {
-    existTargetLang = (await import(`../modules/${moduleName}/${lang}.js`)).default || {} // 读取目标语言翻译
-  }
+  const existTargetLang = hasTargetLangFile ? ((await import(`../modules/${moduleName}/${lang}.js`)).default || {}) : {}// 读取目标语言翻译
 
-  const fieldsToTrans = []
-  const formatChainKey = (key, prekey) => prekey ? `${prekey}.${key}` : key
-  /**
-   * @param {逐层遍历的当前遍历对象} curFrom 
-   * @param {完整的toData} toData 
-   * @param {keychain} preKey 
-   */
-  const loopAndGetNeedTrans = (curFrom = {}, toData = {}, existData = {}, preKey = '') => {
-    for (const [curkey, value] of Object.entries(curFrom)) {
-      const chainKey = formatChainKey(curkey, preKey)
-      if (!value) {
-        set(toData, chainKey, value)
-        continue
-      }
-      if (typeof value === 'string') {
-        const existVal = get(existData, chainKey, '')
-        if (typeof get(existData, chainKey) !== 'string') set(toData, chainKey, '')
-        // 空值才需要翻译，否则沿用
-        if (!value.trim()) {
-          set(toData, chainKey, '')
-        } else if (existVal.trim()) {
-          set(toData, chainKey, existVal) // 复用
-        } else {
-          fieldsToTrans.push(chainKey)
-        }
-        continue
-      }
-      if (typeof value === 'object') {
-        set(toData, chainKey, get(toData, chainKey, {}))
-        loopAndGetNeedTrans(value, toData, existData, chainKey)
-      }
-    }
-  }
-
-  // 获取需要翻译的字段
-  loopAndGetNeedTrans(fromData, result, existTargetLang)
-
+  // 获取需要翻译的字段 & 复用已翻译字段
+  const fieldsToTrans = loopAndGetNeedTrans(fromData, result, existTargetLang)
   // 创建翻译请求参数
   const reqData = fieldsToTrans.map(field => ({ text: get(fromData, field) }))
 
   if (reqData.length) {
     const translations = (await remoteTranslate(reqData, lang, remoteLangDict[from])).data || []
-    translations.forEach((t, i) => {
+    translations.forEach((t, i) =>
       set(result, fieldsToTrans[i], get(t, "translations[0].text", ''))
-    })
+    )
   }
 
-
-  // 遍历重设一遍，保证字段顺序一致
-  const loopAndSet = (curFrom, toData, preKey) => {
-    for (const [curkey, value] of Object.entries(curFrom)) {
-      const chainKey = formatChainKey(curkey, preKey)
-      set(toData, chainKey, get(toData, chainKey))
-      if (typeof value === 'object') {
-        loopAndSet(value, toData, chainKey)
-      }
-    }
-  }
-  // 不翻译也重新生成，保证字段同步一致。
+  // 不翻译也重新生成，保证字段顺序同步一致。
   loopAndSet(fromData, result)
 
   const objString = `export default ${JSON.stringify(result, null, 2)};\n`; // 指定字段输出顺序
